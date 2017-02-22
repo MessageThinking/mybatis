@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- parameterType 输入参数的类型 reultType sql 输出结果映射的java类型 -->
+<!-- 这里最好写成接口的路径 -->
+<mapper namespace="com.wansan.mybatis.dao.UseDao">
+<!-- 查询 -->
+<resultMap type="User" id="resultListUser">
+<id column="id" property="id"/>
+<result column="userName" property="userName"/>
+<result column="userAge" property="userAge" />
+<result column="userAddress" property="userAddress" />
+</resultMap>
+<select id="findByIdMsg" parameterType="String" resultMap="resultListUser">
+select * from `user` where  userName = #{userName}
+</select>
+<select id="findById" parameterType="int" resultType="User">
+select * from `user` where id = #{id}
+</select>
+<insert id="add" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+insert into user(userName,userAge,userAddress) values(#{userName},#{userAge},#{userAddress});
+</insert>
+<update id="update" parameterType="User">
+        update user set userName=#{userName},userAge=#{userAge},userAddress=#{userAddress} where id=#{id}
+</update>
+<delete id="delete" parameterType="int">
+  delete from user where id=#{id}
+</delete>
+<!-- 多表查询 -->
+  <resultMap id="resultUserArticleList" type="Article">
+        <id property="id" column="aid" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <association property="user" javaType="User">
+        <id property="id" column="id" />
+        <result property="userName" column="userName" />
+         <result property="userAddress" column="userAddress" />            
+        </association>        
+    </resultMap>
+<select id="getUserArticles" parameterType="int" resultMap="resultUserArticleList">
+       select user.id,user.userName,user.userAddress,article.id aid,article.title,article.content from user,article
+              where user.id=article.userid and user.id=#{id}
+    </select>
+</mapper>
